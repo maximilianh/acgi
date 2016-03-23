@@ -1,0 +1,76 @@
+#!/usr/bin/env python2.7
+
+import cgitb
+cgitb.enable()
+import cgi, os, subprocess
+
+fieldDef = [("Steward digital signature &nbsp;", "sds", "12334"),
+                    ("Participant temporary ID", "pid", "2B067281-595B-49BF-BBCA-44220929FEFE"),
+                    ("Participant gender", "gen", "M"),
+                    ("Participant ethnicity", "eth", "afr"),
+                    ("Transcript (Gene)", "gene", "BRCA2"),
+                    ("Variant(s) in HGVS", "hgvs", "NM_007294.3:p.Gln356Arg"),
+                    ("Age at diagnosis", "age", "37"),
+                    ("Date of initial diagnosis", "date", "2010/01/13"),
+                    ("Tissue of origin", "too", "breast"),
+                    ("Tissue type", "tt", "stromal"),
+                    ("Tumor classification", "tcl", "Invasive lobular carcinoma"),
+                    ("Tumor morphology", "tmo", "Tubulolobular")
+                    ]
+
+def showForm():
+    print """
+    <html>
+    <head>
+    <style>
+    form  { display: table;      }
+    p     { display: table-row;}
+    label { display: table-cell;}
+    input { display: table-cell;}
+    </style>
+    </head>
+    
+    <body>
+    <h2>Public Ledger Submission: BRCA Genetic Variant</h2>
+    <form action="acgi" method="get">
+    """
+
+    for name, tag, defVal in fieldDef:
+        print """<p><label>%s</label><input type="text" name="%s" value="%s" size="80"><br></p>""" % (name, tag, defVal)
+
+    print '<input type="submit" value="Send Data to Ethereum Ledger">'
+    print """ </body> </html>"""
+
+def postVars(form):
+   vals = []
+   for name, tag, defVal in fieldDef:
+       val = form.getfirst(tag).strip()
+       val = val.replace("'","").replace('"', '') # against sql injections
+       vals.append("%s=%s" % (tag.upper(), val))
+   varDesc = ",".join(vals)
+
+   jsTemplate = open("sendVar.js").read()
+   jsCmd = jsTemplate % varDesc
+   cmd = ["geth","--datadir","/home/ubuntu/.ethereum/testnet/","--exec", jsCmd, "attach", "ipc://home/ubuntu/.ethereum/testnet/geth.ipc"]
+   ret = subprocess.check_output(cmd)
+   tid = ret.replace('"','')
+
+   print "transaction posted to Ethereum ledger to contract 0x1c761940f41734b0acf9430082418aa259f2c784.<br>"
+   print "It should appear within 1-2 minutes on the Ethereum network<br>"
+   print "E.g. on <a href='http://testnet.etherscan.io/address/0x1c761940f41734b0acf9430082418aa259f2c784'>etherscan.io</a><br>"
+   print "Transaction ID: <a href='http://testnet.etherscan.io/tx/%s'>%s</a>" % (tid, tid)
+   #else:
+       #print "Error running the Ethereum client. Please email max@soe.ucsc.edu<p>"
+       #print cmd
+
+def main():
+    print "Content-Type: text/html\n"
+
+    form = cgi.FieldStorage()
+
+    if "sds" in form:
+        postVars(form)
+    else:
+        showForm()
+
+main()
