@@ -46,9 +46,9 @@ def postVars(form):
    for name, tag, defVal in fieldDef:
        val = form.getfirst(tag).strip()
        val = val.replace("'","").replace('"', '') # against sql injections
-       val = val.replace(",","").replace(';', '') # , and ; are reserved
+       val = val.replace(';', '') # ; is reserved
        vals.append("%s=%s" % (tag.upper(), val))
-   varDesc = ",".join(vals)
+   varDesc = ";".join(vals)
 
    jsTemplate = open("sendVar.js").read()
    jsCmd = jsTemplate % varDesc
