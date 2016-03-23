@@ -10,8 +10,9 @@ sudo apt-get install geth
    password for the unlock command is 'acgi' without quotes
    ctrl-a ctrl-d
 
-# do not forget this! otherwise the client can't connect to the GETH instance
-chmod a+rw /home/ubuntu/.ethereum/testnet/geth.ipc
+do not forget this - otherwise the client can't connect to the GETH instance:
+
+    chmod a+rw /home/ubuntu/.ethereum/testnet/geth.ipc
 
 sendVar.js : template to send the transaction, string is marked with %s
 
