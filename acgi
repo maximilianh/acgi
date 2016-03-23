@@ -38,7 +38,7 @@ def showForm():
     for name, tag, defVal in fieldDef:
         print """<p><label>%s</label><input type="text" name="%s" value="%s" size="80"><br></p>""" % (name, tag, defVal)
 
-    print '<input type="submit" value="Send Data to Ethereum Ledger">'
+    print '<input style="font-size:16px" type="submit" value="Send Data to Ethereum Ledger">'
     print """ </body> </html>"""
 
 def postVars(form):
@@ -46,6 +46,7 @@ def postVars(form):
    for name, tag, defVal in fieldDef:
        val = form.getfirst(tag).strip()
        val = val.replace("'","").replace('"', '') # against sql injections
+       val = val.replace(",","").replace(';', '') # , and ; are reserved
        vals.append("%s=%s" % (tag.upper(), val))
    varDesc = ",".join(vals)
 
