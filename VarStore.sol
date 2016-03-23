@@ -3,10 +3,10 @@ contract VarStore {
 
     event VarLog(
         address _from,
-        bytes variantDesc,
+        bytes variantDesc
     );
 
-    function saveVar(bytes) {
-            VarLog(msg.sender, _assembly, _chrom, _pos, _ref, _alt);
+    function saveVar(bytes _varDesc) {
+            VarLog(msg.sender, _varDesc);
     }
 }
